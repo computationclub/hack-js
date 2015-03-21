@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+
+var http = require('http'),
+    fs   = require('fs'),
+    path = require('path'),
+    url  = require('url');
+    port = 4225,
+    hostname = '0.0.0.0',
+    inputFile = process.argv[2],
+    program = compileHackProgram(inputFile);
+
+function compileHackProgram(filePath) {
+  if (!filePath) {
+    console.log('usage: bin/run <file>');
+    process.exit(1);
+  }
+
+  var lines = fs.readFileSync(filePath).toString().split("\n"),
+      json = JSON.stringify(lines);
+
+  return 'window.program = ' + json + ';';
+}
+
+function serveFile(response, filename, contentType) {
+  var filePath = path.join(__dirname, '..', 'src', filename),
+      stat     = fs.statSync(filePath),
+      stream   = fs.createReadStream(filePath);
+
+  response.writeHead(200, {
+    'Content-Type': contentType,
+    'Content-Length': stat.size
+  });
+
+  stream.pipe(response);
+}
+
+function serveProgram(response, program) {
+  response.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Content-Length': program.length
+  });
+
+  response.end(program);
+}
+
+function notFound(response) {
+  var message = "Not Found\n";
+
+  response.writeHead(404, {
+    'Content-Type': 'text/plain',
+    'Content-Length': message.length
+  });
+
+  response.end(message);
+}
+
+http.createServer(function (request, response) {
+  var requestPath = url.parse(request.url).pathname,
+      basename = path.basename(requestPath);
+
+  if (requestPath === '/') {
+    serveFile(response, 'index.html', 'text/html');
+  } else if (basename == 'program.js') {
+    serveProgram(response, program);
+  } else if (basename.slice(-3) === '.js') {
+    serveFile(response, basename, 'application/javascript');
+  } else {
+    notFound(response);
+  }
+}).listen(port, hostname);
+
+console.log('Running ' + path.basename(inputFile) + ' at http://' + hostname + ':' + port);
