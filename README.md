@@ -21,8 +21,8 @@ The only dependency is Node.js. No third-party libraries required.
 Use the `bin/run` binary to run a given Hack file. For example:
 
 ```
-$ bin/run Pong.asm
-Running Pong.asm at http://0.0.0.0:4225
+$ bin/run Pong.hack
+Running Pong.hack at http://0.0.0.0:4225
 ```
 
 This will launch a local web server on port 4225 ("HACK" on a phone
