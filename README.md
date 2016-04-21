@@ -27,5 +27,5 @@ Running Pong.hack at http://0.0.0.0:4225
 
 This will launch a local web server on port 4225 ("HACK" on a phone
 keypad). Navigating to http://0.0.0.0:4225 in a reasonably recent
-browser will run the Hack program and display its output in a 256x512
+browser will run the Hack program and display its output in a 512x256
 HTML5 canvas element.
